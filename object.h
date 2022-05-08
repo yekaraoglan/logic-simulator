@@ -1,6 +1,10 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <SFML/Graphics.hpp>
+
+#define MAX_CONNECTIONS 16 // how many object is connected with this object
+
 
 class Object { // absract  // derived from logic gates
     protected:
@@ -16,19 +20,8 @@ class Object { // absract  // derived from logic gates
     sf::Texture texture;
     sf::Sprite sprite;
 
-    virtual void simulate( ) == 0 ;  // must be defined in derived class
+    virtual void simulate() = 0 ;  // must be defined in derived class
 };
-
-
-class Wire : public Object {
-    private:
-    Pin* pins[2];
-    public:
-    Wire();
-    ~Wire();
-    sf::Vertex line [2];
-    
-}
 
 class Pin {
     private:
@@ -53,20 +46,32 @@ class Pin {
 
 };
 
+
+class Wire : public Object {
+    private:
+    Pin* pins[2];
+    public:
+    Wire();
+    ~Wire();
+    sf::Vertex line [2];
+    
+};
+
+
+
 class LogicElement : public Object {
     Pin pins[4];
     int numPins;
     public:
     LogicElement();
     LogicElement(int);
-    ~LogicElement();
+    virtual ~LogicElement() = 0;
     virtual void simulate() = 0;
 };
 
 class AndGate: public LogicElement{
     public:
-    AndGate();
-    AndGate(int);
+    AndGate(bool);
     ~AndGate();
     private:
     void simulate();
@@ -75,32 +80,32 @@ class AndGate: public LogicElement{
 
 class OrGate: public LogicElement{
     public:
-    OrGate();
-    ~Orgate();
+    OrGate(bool);
+    ~OrGate();
     private:
     void simulate();
     
 };
 
-class XorGate: public LogicElement{
+class NotGate: public LogicElement{
     public:
-    XorGate();
-    ~XorGate();
+    NotGate(bool);
+    ~NotGate();
     private:
     void simulate();
 };
 
-class NotGate: public LogicElement{
+class XorGate: public LogicElement{
     public:
-    NotGate();
-    ~NotGate();
+    XorGate(bool);
+    ~XorGate();
     private:
     void simulate();
 };
 
 class DFlipFlop: public LogicElement{
     public:
-    DFlipFlop();
+    DFlipFlop(bool);
     ~DFlipFlop();
     private:
     void simulate();
@@ -108,7 +113,7 @@ class DFlipFlop: public LogicElement{
 
 class LogicOne: public LogicElement{
     public:
-    LogicOne();
+    LogicOne(bool);
     ~LogicOne();
     private:
     void simulate();
@@ -116,14 +121,16 @@ class LogicOne: public LogicElement{
 
 class Gnd: public LogicElement{
     public:
-    Gnd()
+    Gnd(bool);
+    ~Gnd();
     private:
     void simulate();
 };
 
 class Clock: public LogicElement{
     public:
-    Clock()
+    Clock(bool);
+    ~Clock();
     private:
     sf::Clock clock;
     void simulate();
@@ -131,7 +138,8 @@ class Clock: public LogicElement{
 
 class LED: public LogicElement{
     public:
-    LED()
+    LED(bool);
+    ~LED();
     private:
     void simulate();
     
