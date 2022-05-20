@@ -5,151 +5,199 @@
 
 #define MAX_CONNECTIONS 16 // how many object is connected with this object
 
-
-class Object { // absract  // derived from logic gates
-    protected:
-    Object* next;
+class Object
+{ // absract  // derived from logic gates
+protected:
+    Object *next;
     bool locked;
     bool state;
     bool selected;
 
-    public:
+public:
     Object();
     ~Object();
-    sf::RenderWindow* window;
-    sf::Texture texture;
+    sf::RenderWindow *window;
+    sf::Texture textures[2];
     sf::Sprite sprite;
 
-    virtual void simulate() = 0 ;  // must be defined in derived class
+    sf::Sprite getSprite();
+    sf::Vector2f getPos();
+    void setPos(int, int);
+
+    virtual Object* createNewObject(sf::Mouse) = 0;
+    virtual void simulate() = 0; // must be defined in derived class
 };
 
-class Pin {
-    private:
-    enum pinType { INPUT, OUTPUT }; //enum for pin type (input or output pin) 
-    enum pinState { HIGHZ, LOW, HIGH }; //enum for pin state 
-    
+class Pin
+{
+public:
+    enum pinType
+    {
+        INPUT,
+        OUTPUT
+    }; // enum for pin type (input or output pin)
+    enum pinState
+    {
+        LOW, // 0
+        HIGH, // 1
+        HIGHZ // not determined
+    }; // enum for pin state
+
     int index;
-    
-    public:
+
     Pin();
     ~Pin();
 
     pinType type;
     bool isSrc[MAX_CONNECTIONS];
 
-    Pin* conntectedTo[MAX_CONNECTIONS];
-    Object* wires[MAX_CONNECTIONS];
+    Pin *conntectedTo[MAX_CONNECTIONS];
+    Object *wires[MAX_CONNECTIONS];
     int numConnections;
     sf::Vector2f pos;
     pinState state;
-
-
 };
 
+class Wire : public Object
+{
+private:
+    Pin *pins[2];
 
-class Wire : public Object {
-    private:
-    Pin* pins[2];
-    public:
-    Wire();
+public:
+    Wire(Pin*, Pin*);
     ~Wire();
-    sf::Vertex line [2];
-    
+    sf::Vertex line[2];
 };
 
-
-
-class LogicElement : public Object {
+class LogicElement : public Object
+{
+protected:
     Pin pins[4];
     int numPins;
-    public:
+
+public:
     LogicElement();
     LogicElement(int);
     virtual ~LogicElement() = 0;
     virtual void simulate() = 0;
 };
 
-class AndGate: public LogicElement{
-    public:
+class AndGate : public LogicElement
+{
+public:
     AndGate(bool);
     ~AndGate();
-    private:
+
+    Object* createNewObject(sf::Mouse);
+
+private:
     void simulate();
-    
 };
 
-class OrGate: public LogicElement{
-    public:
+class OrGate : public LogicElement
+{
+public:
     OrGate(bool);
     ~OrGate();
-    private:
+
+    Object* createNewObject(sf::Mouse);
+
+private:
     void simulate();
-    
 };
 
-class NotGate: public LogicElement{
-    public:
+class NotGate : public LogicElement
+{
+public:
     NotGate(bool);
     ~NotGate();
-    private:
+
+    Object* createNewObject(sf::Mouse);
+
+private:
     void simulate();
 };
 
-class XorGate: public LogicElement{
-    public:
+class XorGate : public LogicElement
+{
+public:
     XorGate(bool);
     ~XorGate();
-    private:
+
+    Object* createNewObject(sf::Mouse);
+
+private:
     void simulate();
 };
 
-class DFlipFlop: public LogicElement{
-    public:
+class DFlipFlop : public LogicElement
+{
+public:
     DFlipFlop(bool);
     ~DFlipFlop();
-    private:
+
+    Object* createNewObject(sf::Mouse);
+
+private:
     void simulate();
 };
 
-class LogicOne: public LogicElement{
-    public:
+class LogicOne : public LogicElement
+{
+public:
     LogicOne(bool);
     ~LogicOne();
-    private:
+
+    Object* createNewObject(sf::Mouse);
+
+private:
     void simulate();
 };
 
-class Gnd: public LogicElement{
-    public:
+class Gnd : public LogicElement
+{
+public:
     Gnd(bool);
     ~Gnd();
-    private:
+
+    Object* createNewObject(sf::Mouse);
+
+private:
     void simulate();
 };
 
-class Clock: public LogicElement{
-    public:
+class Clock : public LogicElement
+{
+public:
     Clock(bool);
     ~Clock();
-    private:
+
+    Object* createNewObject(sf::Mouse);
+
+private:
     sf::Clock clock;
     void simulate();
 };
 
-class LED: public LogicElement{
-    public:
+class LED : public LogicElement
+{
+public:
     LED(bool);
     ~LED();
-    private:
+
+    Object* createNewObject(sf::Mouse);
+
+private:
     void simulate();
-    
 };
 
-class Simulator {
-    public:
+class Simulator
+{
+    private:
+    std::vector<Object*> objects;
+public:
     Simulator();
-
+    void addObject(Object*);
 };
 
 #endif // !OBJECT_H
-
