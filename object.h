@@ -70,6 +70,7 @@ public:
     sf::Vertex line[2];
     void simulate();
     Pin** getPins();
+    void updateWirePos();
 };
 
 class LogicElement : public Object

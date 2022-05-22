@@ -123,6 +123,12 @@ void Wire::simulate()
 
 }
 
+void Wire::updateWirePos()
+{
+    line[0] = sf::Vertex(sf::Vector2f(pins[0]->pos.x + pins[0]->rect.left+8, pins[0]->pos.y + pins[0]->rect.top+5));
+    line[1] = sf::Vertex(sf::Vector2f(pins[1]->pos.x + pins[1]->rect.left+8, pins[1]->pos.y + pins[1]->rect.top+5));
+}
+
 Pin::Pin()
 {
     // std::cout << "Pin created" << std::endl;
@@ -468,6 +474,15 @@ void Clock::simulate()
 {
     // 1 HIGH 1 LOW oscillation
     // std::cout << "Clock simulated" << std::endl;
+    sf::Time elapsedTime = clock.getElapsedTime();
+
+    if (elapsedTime.asSeconds() >= 1)
+    {
+        if (pins[0].state != Pin::pinState::LOW) pins[0].state = Pin::pinState::LOW;
+        else pins[0].state = Pin::pinState::HIGH;
+
+        clock.restart();
+    }
 }
 
 Clock::~Clock()
