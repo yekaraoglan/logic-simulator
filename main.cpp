@@ -66,6 +66,10 @@ int main()
     std::vector<sf::Sprite> mainSprites;
     std::vector<sf::Sprite> addedSprites;
 
+    bool drawingWire = false;
+    sf::Vertex wire[2];
+    Pin *selectedPins[2];
+
     mainSprites.push_back(start);
     mainSprites.push_back(stop);
     mainSprites.push_back(andGate.sprite);
@@ -78,12 +82,12 @@ int main()
     mainSprites.push_back(led.sprite);
     mainSprites.push_back(clock.sprite);
 
-    for (int j=0; j<mainSprites.size(); j++)
-    {
-        std::cout << j << std::endl;
-        std::cout << mainSprites[j].getGlobalBounds().width << std::endl;
-        std::cout << mainSprites[j].getGlobalBounds().height << std::endl;
-    }
+    // for (int j = 0; j < mainSprites.size(); j++)
+    // {
+    //     std::cout << j << std::endl;
+    //     std::cout << mainSprites[j].getGlobalBounds().width << std::endl;
+    //     std::cout << mainSprites[j].getGlobalBounds().height << std::endl;
+    // }
 
     while (window.isOpen())
     {
@@ -111,21 +115,42 @@ int main()
                             selectedSprite = selected->getSprite();
                             draggingObject = true;
                             // std::cout << floatrect.top << " " << floatrect.left << " " << floatrect.width << " " << floatrect.height << std::endl;
-                            
+
                             std::cout << "Selected object" << std::endl;
 
                             break;
                         }
                     }
+
                     for (int j = 0; j < sim.getLogicElements().size(); j++)
                     {
                         if (sim.getLogicElements()[j]->getSprite().getGlobalBounds().contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
                         {
-                            for (int k = 0; k < sim.getLogicElements()[j]->getNumPins(); k++){
+                            std::cout << "Clicked a placed element" << std::endl;
+
+                            for (int k = 0; k < sim.getLogicElements()[j]->getNumPins(); k++)
+                            {
                                 if (sim.getLogicElements()[j]->getPins()[k].rect.contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
                                 {
                                     std::cout << "Selected pin" << std::endl;
-                                    
+
+                                    if (!drawingWire)
+                                    {
+                                        selectedPins[0] = &sim.getLogicElements()[j]->getPins()[k];
+                                        drawingWire = true;
+                                    }
+                                    else
+                                    {
+                                        selectedPins[1] = &sim.getLogicElements()[j]->getPins()[k];
+                                        drawingWire = false;
+
+                                        Wire *w = new Wire(selectedPins[0], selectedPins[1]);
+                                        sim.addWire(w);
+                                    }
+
+                                    wire[0] = sf::Vertex(sf::Vector2f(sim.getLogicElements()[j]->getPins()[k].rect.left + 8, sim.getLogicElements()[j]->getPins()[k].rect.top + 5));
+                                    wire[1] = sf::Vertex(sf::Vector2f(mouse.getPosition().x, mouse.getPosition().y));
+
                                     break;
                                 }
                             }
@@ -136,28 +161,44 @@ int main()
             }
             else if (event.type == sf::Event::MouseButtonReleased)
             {
-                if (selected != nullptr){
+                if (selected != nullptr)
+                {
                     draggingObject = false;
                     // Create new object
                     sim.addLogicElement(selected->createNewLogicElement(mouse));
-                    
+
                     addedSprites.push_back(selectedSprite);
                 }
+
                 selected = nullptr;
                 // std::cout << "Dragging stopped" << std::endl;
             }
 
             if (draggingObject)
             {
-                selectedSprite.setPosition(mouse.getPosition().x - window.getPosition().x, mouse.getPosition().y - window.getPosition().y);
+                selectedSprite.setPosition(mouse.getPosition().x, mouse.getPosition().y);
                 // addedSprites.push_back(selectedSprite);
                 window.draw(selectedSprite);
                 // std::cout << "Dragging" << std::endl;
             }
 
-            for (int i = 0; i < addedSprites.size(); i++)
-                window.draw(addedSprites[i]);
-        }       
+            if (drawingWire)
+            {
+                std::cout << "Drawing wire" << std::endl;
+                wire[1] = sf::Vertex(sf::Vector2f(mouse.getPosition().x, mouse.getPosition().y));
+                window.draw(wire, 20, sf::Lines);
+            }
+
+            for (int i = 0; i < sim.getLogicElements().size(); i++)
+            {
+                window.draw(sim.getLogicElements()[i]->getSprite());
+            }
+
+            for (int i = 0; i < sim.getWires().size(); i++)
+            {
+                window.draw(sim.getWires()[i]->line, 20, sf::Lines);
+            }
+        }
 
         window.display();
     }

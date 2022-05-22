@@ -37,10 +37,10 @@ public:
     }; // enum for pin typmenuObjects[i]e (input or output pin)
     enum pinState
     {
-        LOW, // 0
+        LOW,  // 0
         HIGH, // 1
         HIGHZ // not determined
-    }; // enum for pin state
+    };        // enum for pin state
 
     int index;
 
@@ -65,9 +65,10 @@ private:
     Pin *pins[2];
 
 public:
-    Wire(Pin*, Pin*);
+    Wire(Pin *, Pin *);
     ~Wire();
     sf::Vertex line[2];
+    void simulate();
 };
 
 class LogicElement : public Object
@@ -82,10 +83,10 @@ public:
     LogicElement(int);
     virtual ~LogicElement() = 0;
     virtual void simulate() = 0;
-    virtual LogicElement* createNewLogicElement(sf::Mouse) = 0;
+    virtual LogicElement *createNewLogicElement(sf::Mouse) = 0;
     virtual void configurePins() = 0;
     // std::vector<Pin> getPins();
-    Pin* getPins();
+    Pin *getPins();
     int getNumPins();
 };
 
@@ -95,7 +96,7 @@ public:
     AndGate(bool);
     ~AndGate();
 
-    LogicElement* createNewLogicElement(sf::Mouse);
+    LogicElement *createNewLogicElement(sf::Mouse);
     void configurePins();
 
 private:
@@ -108,8 +109,9 @@ public:
     OrGate(bool);
     ~OrGate();
 
-    LogicElement* createNewLogicElement(sf::Mouse);
+    LogicElement *createNewLogicElement(sf::Mouse);
     void configurePins();
+
 private:
     void simulate();
 };
@@ -120,8 +122,9 @@ public:
     NotGate(bool);
     ~NotGate();
 
-    LogicElement* createNewLogicElement(sf::Mouse);
+    LogicElement *createNewLogicElement(sf::Mouse);
     void configurePins();
+
 private:
     void simulate();
 };
@@ -132,8 +135,9 @@ public:
     XorGate(bool);
     ~XorGate();
 
-    LogicElement* createNewLogicElement(sf::Mouse);
+    LogicElement *createNewLogicElement(sf::Mouse);
     void configurePins();
+
 private:
     void simulate();
 };
@@ -144,8 +148,9 @@ public:
     DFlipFlop(bool);
     ~DFlipFlop();
 
-    LogicElement* createNewLogicElement(sf::Mouse);
+    LogicElement *createNewLogicElement(sf::Mouse);
     void configurePins();
+
 private:
     void simulate();
 };
@@ -156,8 +161,9 @@ public:
     LogicOne(bool);
     ~LogicOne();
 
-    LogicElement* createNewLogicElement(sf::Mouse);
+    LogicElement *createNewLogicElement(sf::Mouse);
     void configurePins();
+
 private:
     void simulate();
 };
@@ -168,8 +174,9 @@ public:
     Gnd(bool);
     ~Gnd();
 
-    LogicElement* createNewLogicElement(sf::Mouse);
+    LogicElement *createNewLogicElement(sf::Mouse);
     void configurePins();
+
 private:
     void simulate();
 };
@@ -180,8 +187,9 @@ public:
     Clock(bool);
     ~Clock();
 
-    LogicElement* createNewLogicElement(sf::Mouse);
+    LogicElement *createNewLogicElement(sf::Mouse);
     void configurePins();
+
 private:
     sf::Clock clock;
     void simulate();
@@ -193,20 +201,25 @@ public:
     LED(bool);
     ~LED();
 
-    LogicElement* createNewLogicElement(sf::Mouse);
+    LogicElement *createNewLogicElement(sf::Mouse);
     void configurePins();
+
 private:
     void simulate();
 };
 
 class Simulator
 {
-    private:
-    std::vector<LogicElement*> logicElements;
+private:
+    std::vector<LogicElement *> logicElements;
+    std::vector<Wire *> wires;
+
 public:
     Simulator();
-    void addLogicElement(LogicElement*);
-    std::vector<LogicElement*> getLogicElements();
+    void addLogicElement(LogicElement *);
+    void addWire(Wire *);
+    std::vector<LogicElement *> getLogicElements();
+    std::vector<Wire *> getWires();
 };
 
 #endif // !OBJECT_H
