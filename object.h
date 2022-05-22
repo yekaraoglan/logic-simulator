@@ -24,7 +24,6 @@ public:
     sf::Vector2f getPos();
     void setPos(int, int);
 
-    virtual Object* createNewObject(sf::Mouse) = 0;
     virtual void simulate() = 0; // must be defined in derived class
 };
 
@@ -35,7 +34,7 @@ public:
     {
         INPUT,
         OUTPUT
-    }; // enum for pin type (input or output pin)
+    }; // enum for pin typmenuObjects[i]e (input or output pin)
     enum pinState
     {
         LOW, // 0
@@ -51,11 +50,13 @@ public:
     pinType type;
     bool isSrc[MAX_CONNECTIONS];
 
-    Pin *conntectedTo[MAX_CONNECTIONS];
+    Pin *connectedTo[MAX_CONNECTIONS];
     Object *wires[MAX_CONNECTIONS];
     int numConnections;
     sf::Vector2f pos;
+    sf::FloatRect rect;
     pinState state;
+    void setPos(sf::Vector2f);
 };
 
 class Wire : public Object
@@ -72,6 +73,7 @@ public:
 class LogicElement : public Object
 {
 protected:
+    // std::vector<Pin> pins;
     Pin pins[4];
     int numPins;
 
@@ -80,6 +82,11 @@ public:
     LogicElement(int);
     virtual ~LogicElement() = 0;
     virtual void simulate() = 0;
+    virtual LogicElement* createNewLogicElement(sf::Mouse) = 0;
+    virtual void configurePins() = 0;
+    // std::vector<Pin> getPins();
+    Pin* getPins();
+    int getNumPins();
 };
 
 class AndGate : public LogicElement
@@ -88,7 +95,8 @@ public:
     AndGate(bool);
     ~AndGate();
 
-    Object* createNewObject(sf::Mouse);
+    LogicElement* createNewLogicElement(sf::Mouse);
+    void configurePins();
 
 private:
     void simulate();
@@ -100,8 +108,8 @@ public:
     OrGate(bool);
     ~OrGate();
 
-    Object* createNewObject(sf::Mouse);
-
+    LogicElement* createNewLogicElement(sf::Mouse);
+    void configurePins();
 private:
     void simulate();
 };
@@ -112,8 +120,8 @@ public:
     NotGate(bool);
     ~NotGate();
 
-    Object* createNewObject(sf::Mouse);
-
+    LogicElement* createNewLogicElement(sf::Mouse);
+    void configurePins();
 private:
     void simulate();
 };
@@ -124,8 +132,8 @@ public:
     XorGate(bool);
     ~XorGate();
 
-    Object* createNewObject(sf::Mouse);
-
+    LogicElement* createNewLogicElement(sf::Mouse);
+    void configurePins();
 private:
     void simulate();
 };
@@ -136,8 +144,8 @@ public:
     DFlipFlop(bool);
     ~DFlipFlop();
 
-    Object* createNewObject(sf::Mouse);
-
+    LogicElement* createNewLogicElement(sf::Mouse);
+    void configurePins();
 private:
     void simulate();
 };
@@ -148,8 +156,8 @@ public:
     LogicOne(bool);
     ~LogicOne();
 
-    Object* createNewObject(sf::Mouse);
-
+    LogicElement* createNewLogicElement(sf::Mouse);
+    void configurePins();
 private:
     void simulate();
 };
@@ -160,8 +168,8 @@ public:
     Gnd(bool);
     ~Gnd();
 
-    Object* createNewObject(sf::Mouse);
-
+    LogicElement* createNewLogicElement(sf::Mouse);
+    void configurePins();
 private:
     void simulate();
 };
@@ -172,8 +180,8 @@ public:
     Clock(bool);
     ~Clock();
 
-    Object* createNewObject(sf::Mouse);
-
+    LogicElement* createNewLogicElement(sf::Mouse);
+    void configurePins();
 private:
     sf::Clock clock;
     void simulate();
@@ -185,8 +193,8 @@ public:
     LED(bool);
     ~LED();
 
-    Object* createNewObject(sf::Mouse);
-
+    LogicElement* createNewLogicElement(sf::Mouse);
+    void configurePins();
 private:
     void simulate();
 };
@@ -194,10 +202,11 @@ private:
 class Simulator
 {
     private:
-    std::vector<Object*> objects;
+    std::vector<LogicElement*> logicElements;
 public:
     Simulator();
-    void addObject(Object*);
+    void addLogicElement(LogicElement*);
+    std::vector<LogicElement*> getLogicElements();
 };
 
 #endif // !OBJECT_H

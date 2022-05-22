@@ -15,6 +15,8 @@
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(960, 720), "My window");
+    window.setPosition(sf::Vector2i(0, 0));
+    sf::Vector2i windowPose = window.getPosition();
     AndGate andGate(true);
     OrGate orGate(true);
     NotGate notGate(true);
@@ -27,7 +29,7 @@ int main()
 
     Simulator sim;
 
-    std::vector<Object *> menuObjects;
+    std::vector<LogicElement *> menuObjects;
     menuObjects.push_back(&andGate);
     menuObjects.push_back(&orGate);
     menuObjects.push_back(&notGate);
@@ -58,10 +60,9 @@ int main()
     stop.setTexture(stop_text);
     stop.setPosition(sf::Vector2f(400, 50));
 
-    Object *selected;
+    LogicElement *selected;
     sf::Sprite selectedSprite;
     bool draggingObject = false;
-
     std::vector<sf::Sprite> mainSprites;
     std::vector<sf::Sprite> addedSprites;
 
@@ -76,6 +77,13 @@ int main()
     mainSprites.push_back(gnd.sprite);
     mainSprites.push_back(led.sprite);
     mainSprites.push_back(clock.sprite);
+
+    for (int j=0; j<mainSprites.size(); j++)
+    {
+        std::cout << j << std::endl;
+        std::cout << mainSprites[j].getGlobalBounds().width << std::endl;
+        std::cout << mainSprites[j].getGlobalBounds().height << std::endl;
+    }
 
     while (window.isOpen())
     {
@@ -102,9 +110,25 @@ int main()
                             selected = menuObjects[i];
                             selectedSprite = selected->getSprite();
                             draggingObject = true;
-
+                            // std::cout << floatrect.top << " " << floatrect.left << " " << floatrect.width << " " << floatrect.height << std::endl;
+                            
                             std::cout << "Selected object" << std::endl;
 
+                            break;
+                        }
+                    }
+                    for (int j = 0; j < sim.getLogicElements().size(); j++)
+                    {
+                        if (sim.getLogicElements()[j]->getSprite().getGlobalBounds().contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
+                        {
+                            for (int k = 0; k < sim.getLogicElements()[j]->getNumPins(); k++){
+                                if (sim.getLogicElements()[j]->getPins()[k].rect.contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
+                                {
+                                    std::cout << "Selected pin" << std::endl;
+                                    
+                                    break;
+                                }
+                            }
                             break;
                         }
                     }
@@ -112,11 +136,15 @@ int main()
             }
             else if (event.type == sf::Event::MouseButtonReleased)
             {
-                draggingObject = false;
-                // Create new object
-                sim.addObject(selected->createNewObject(mouse));
-                addedSprites.push_back(selectedSprite);
-                std::cout << "Dragging stopped" << std::endl;
+                if (selected != nullptr){
+                    draggingObject = false;
+                    // Create new object
+                    sim.addLogicElement(selected->createNewLogicElement(mouse));
+                    
+                    addedSprites.push_back(selectedSprite);
+                }
+                selected = nullptr;
+                // std::cout << "Dragging stopped" << std::endl;
             }
 
             if (draggingObject)
@@ -124,12 +152,12 @@ int main()
                 selectedSprite.setPosition(mouse.getPosition().x - window.getPosition().x, mouse.getPosition().y - window.getPosition().y);
                 // addedSprites.push_back(selectedSprite);
                 window.draw(selectedSprite);
-                std::cout << "Dragging" << std::endl;
+                // std::cout << "Dragging" << std::endl;
             }
 
             for (int i = 0; i < addedSprites.size(); i++)
                 window.draw(addedSprites[i]);
-        }
+        }       
 
         window.display();
     }
