@@ -198,6 +198,11 @@ int main()
             {
                 window.draw(sim.getWires()[i]->line, 20, sf::Lines);
             }
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+            {
+                sim.simulate();
+            }
         }
 
         window.display();

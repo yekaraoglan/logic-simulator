@@ -69,6 +69,7 @@ public:
     ~Wire();
     sf::Vertex line[2];
     void simulate();
+    Pin** getPins();
 };
 
 class LogicElement : public Object
@@ -220,6 +221,8 @@ public:
     void addWire(Wire *);
     std::vector<LogicElement *> getLogicElements();
     std::vector<Wire *> getWires();
+
+    void simulate();
 };
 
 #endif // !OBJECT_H

@@ -186,6 +186,10 @@ AndGate::AndGate(bool is_locked) : LogicElement(3)
     pins[0].type = Pin::pinType::INPUT;
     pins[1].type = Pin::pinType::INPUT;
     pins[2].type = Pin::pinType::OUTPUT;
+
+    pins[0].state = Pin::pinState::HIGHZ;
+    pins[1].state = Pin::pinState::HIGHZ;
+    pins[2].state = Pin::pinState::HIGHZ;
 }
 
 void AndGate::configurePins()
@@ -224,6 +228,10 @@ OrGate::OrGate(bool is_locked) : LogicElement(3)
     pins[0].type = Pin::pinType::INPUT;
     pins[1].type = Pin::pinType::INPUT;
     pins[2].type = Pin::pinType::OUTPUT;
+
+    pins[0].state = Pin::pinState::HIGHZ;
+    pins[1].state = Pin::pinState::HIGHZ;
+    pins[2].state = Pin::pinState::HIGHZ;
 }
 
 void OrGate::configurePins()
@@ -261,6 +269,9 @@ NotGate::NotGate(bool is_locked) : LogicElement(2)
 
     pins[0].type = Pin::pinType::INPUT;
     pins[1].type = Pin::pinType::OUTPUT;
+
+    pins[0].state = Pin::pinState::HIGHZ;
+    pins[1].state = Pin::pinState::HIGHZ;
 }
 
 void NotGate::configurePins()
@@ -298,6 +309,10 @@ XorGate::XorGate(bool is_locked) : LogicElement(3)
     pins[0].type = Pin::pinType::INPUT;
     pins[1].type = Pin::pinType::INPUT;
     pins[2].type = Pin::pinType::OUTPUT;
+
+    pins[0].state = Pin::pinState::HIGHZ;
+    pins[1].state = Pin::pinState::HIGHZ;
+    pins[2].state = Pin::pinState::HIGHZ;
 }
 
 void XorGate::configurePins()
@@ -337,6 +352,11 @@ DFlipFlop::DFlipFlop(bool is_locked) : LogicElement(4)
     pins[1].type = Pin::pinType::INPUT;
     pins[2].type = Pin::pinType::OUTPUT;
     pins[3].type = Pin::pinType::OUTPUT;
+
+    pins[0].state = Pin::pinState::HIGHZ;
+    pins[1].state = Pin::pinState::HIGHZ;
+    pins[2].state = Pin::pinState::HIGHZ;
+    pins[3].state = Pin::pinState::HIGHZ;
 }
 
 void DFlipFlop::configurePins()
@@ -369,6 +389,8 @@ LogicOne::LogicOne(bool is_locked) : LogicElement(1)
     // std::cout << "LogicOne created" << std::endl;
 
     pins[0].type = Pin::pinType::OUTPUT;
+
+    pins[0].state = Pin::pinState::HIGH;
 }
 
 void LogicOne::configurePins()
@@ -400,6 +422,8 @@ Gnd::Gnd(bool is_locked) : LogicElement(1)
     // std::cout << "Gnd created" << std::endl;
 
     pins[0].type = Pin::pinType::OUTPUT;
+
+    pins[0].state = Pin::pinState::LOW;
 }
 
 void Gnd::configurePins()
@@ -431,6 +455,8 @@ Clock::Clock(bool is_locked) : LogicElement(1)
     // std::cout << "Clock created" << std::endl;
 
     pins[0].type = Pin::pinType::OUTPUT;
+
+    pins[0].state = Pin::pinState::HIGH;
 }
 
 void Clock::configurePins()
@@ -462,6 +488,8 @@ LED::LED(bool is_locked) : LogicElement(1)
     // std::cout << "LED created" << std::endl;
 
     pins[0].type = Pin::pinType::INPUT;
+
+    pins[0].state = Pin::pinState::LOW;
 }
 
 void LED::configurePins()
@@ -489,6 +517,7 @@ LED::~LED()
 
 Simulator::Simulator()
 {
+
 }
 
 void Simulator::addLogicElement(LogicElement *l)
@@ -509,4 +538,25 @@ void Simulator::addWire(Wire *l)
 std::vector<Wire *> Simulator::getWires()
 {
     return wires;
+}
+
+void Simulator::simulate()
+{
+    for (int i=0; i<wires.size(); i++)
+    {
+        for (int j=0; j<logicElements.size(); j++)
+        {
+            logicElements[j]->simulate();
+        }
+
+        for (int j=0; j<wires.size(); j++)
+        {
+            wires[j]->getPins()[1]->state = wires[j]->getPins()[0]->state;
+        }
+    }
+}
+
+Pin** Wire::getPins()
+{
+    return pins;
 }
