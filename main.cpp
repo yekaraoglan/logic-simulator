@@ -149,7 +149,7 @@ int main()
                                     }
 
                                     wire[0] = sf::Vertex(sf::Vector2f(sim.getLogicElements()[j]->getPins()[k].rect.left + 8, sim.getLogicElements()[j]->getPins()[k].rect.top + 5));
-                                    wire[1] = sf::Vertex(sf::Vector2f(mouse.getPosition().x, mouse.getPosition().y));
+                                    wire[1] = sf::Vertex(sf::Vector2f(mouse.getPosition(window).x, mouse.getPosition(window).y));
 
                                     break;
                                 }
@@ -176,7 +176,7 @@ int main()
 
             if (draggingObject)
             {
-                selectedSprite.setPosition(mouse.getPosition().x, mouse.getPosition().y);
+                selectedSprite.setPosition(mouse.getPosition(window).x, mouse.getPosition(window).y);
                 // addedSprites.push_back(selectedSprite);
                 window.draw(selectedSprite);
                 // std::cout << "Dragging" << std::endl;
@@ -185,7 +185,7 @@ int main()
             if (drawingWire)
             {
                 std::cout << "Drawing wire" << std::endl;
-                wire[1] = sf::Vertex(sf::Vector2f(mouse.getPosition().x, mouse.getPosition().y));
+                wire[1] = sf::Vertex(sf::Vector2f(mouse.getPosition(window).x, mouse.getPosition(window).y));
                 window.draw(wire, 20, sf::Lines);
             }
 
