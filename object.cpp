@@ -114,8 +114,8 @@ Wire::Wire(Pin *pin1, Pin *pin2)
     pins[1]->wires[pins[1]->numConnections] = this;
     pins[1]->numConnections++;
 
-    line[0] = sf::Vertex(sf::Vector2f(pins[0]->pos.x + pins[0]->rect.left+8, pins[0]->pos.y + pins[0]->rect.top+5));
-    line[1] = sf::Vertex(sf::Vector2f(pins[1]->pos.x + pins[1]->rect.left+8, pins[1]->pos.y + pins[1]->rect.top+5));
+    line[0] = sf::Vertex(sf::Vector2f(pins[0]->pos.x + pins[0]->rect.left + 8, pins[0]->pos.y + pins[0]->rect.top + 5));
+    line[1] = sf::Vertex(sf::Vector2f(pins[1]->pos.x + pins[1]->rect.left + 8, pins[1]->pos.y + pins[1]->rect.top + 5));
 }
 
 Wire::~Wire()
@@ -125,13 +125,12 @@ Wire::~Wire()
 
 void Wire::simulate()
 {
-
 }
 
 void Wire::updateWirePos()
 {
-    line[0] = sf::Vertex(sf::Vector2f(pins[0]->pos.x + pins[0]->rect.left+8, pins[0]->pos.y + pins[0]->rect.top+5));
-    line[1] = sf::Vertex(sf::Vector2f(pins[1]->pos.x + pins[1]->rect.left+8, pins[1]->pos.y + pins[1]->rect.top+5));
+    line[0] = sf::Vertex(sf::Vector2f(pins[0]->pos.x + pins[0]->rect.left + 8, pins[0]->pos.y + pins[0]->rect.top + 5));
+    line[1] = sf::Vertex(sf::Vector2f(pins[1]->pos.x + pins[1]->rect.left + 8, pins[1]->pos.y + pins[1]->rect.top + 5));
 }
 
 Pin::Pin()
@@ -182,9 +181,9 @@ int LogicElement::getNumPins()
 LogicElement::~LogicElement()
 {
     // std::cout << "LogicElement destroyed" << std::endl;
-    for (int i=0; i<numPins; i++)
+    for (int i = 0; i < numPins; i++)
     {
-        for(int j=0; j<pins[i].numConnections; j++)
+        for (int j = 0; j < pins[i].numConnections; j++)
         {
             delete pins[i].wires[j];
         }
@@ -389,6 +388,19 @@ void DFlipFlop::configurePins()
 void DFlipFlop::simulate()
 {
     // std::cout << "DFlipFlop simulated" << std::endl;
+    if (pins[1].state == Pin::pinState::HIGH)
+    {
+        if (pins[0].state == Pin::pinState::HIGH)
+        {
+            pins[2].state = Pin::pinState::HIGH;
+            pins[3].state = Pin::pinState::LOW;
+        }
+        else if (pins[0].state == Pin::pinState::LOW)
+        {
+            pins[2].state = Pin::pinState::LOW;
+            pins[3].state = Pin::pinState::HIGH;
+        }
+    }
 }
 
 DFlipFlop::~DFlipFlop()
@@ -491,8 +503,10 @@ void Clock::simulate()
 
     if (elapsedTime.asSeconds() >= 1)
     {
-        if (pins[0].state != Pin::pinState::LOW) pins[0].state = Pin::pinState::LOW;
-        else pins[0].state = Pin::pinState::HIGH;
+        if (pins[0].state != Pin::pinState::LOW)
+            pins[0].state = Pin::pinState::LOW;
+        else
+            pins[0].state = Pin::pinState::HIGH;
 
         clock.restart();
     }
@@ -530,9 +544,9 @@ void LED::simulate()
 {
     // texture[0] for LOW
     // texture[1] for HIGH
-    if (pins[0].state)
+    if (pins[0].state == Pin::pinState::HIGH)
         sprite.setTexture(textures[1]);
-    else
+    else if (pins[0].state == Pin::pinState::LOW)
         sprite.setTexture(textures[0]);
 
     // std::cout << "LED simulated" << std::endl;
@@ -545,7 +559,6 @@ LED::~LED()
 
 Simulator::Simulator()
 {
-
 }
 
 void Simulator::addLogicElement(LogicElement *l)
@@ -555,7 +568,7 @@ void Simulator::addLogicElement(LogicElement *l)
 
 void Simulator::deleteLogicElement(int idx)
 {
-    LogicElement * l = logicElements[idx];
+    LogicElement *l = logicElements[idx];
     logicElements.erase(logicElements.begin() + idx);
     delete l;
     logicElements.shrink_to_fit();
@@ -580,21 +593,21 @@ void Simulator::simulate()
 {
     wires.shrink_to_fit();
 
-    for (int i=0; i<wires.size(); i++)
+    for (int i = 0; i < wires.size(); i++)
     {
-        for (int j=0; j<logicElements.size(); j++)
+        for (int j = 0; j < logicElements.size(); j++)
         {
             logicElements[j]->simulate();
         }
 
-        for (int j=0; j<wires.size(); j++)
+        for (int j = 0; j < wires.size(); j++)
         {
             wires[j]->getPins()[1]->state = wires[j]->getPins()[0]->state;
         }
     }
 }
 
-Pin** Wire::getPins()
+Pin **Wire::getPins()
 {
     return pins;
 }
