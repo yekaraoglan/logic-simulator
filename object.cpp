@@ -109,6 +109,11 @@ Wire::Wire(Pin *pin1, Pin *pin2)
     pins[0] = pin1;
     pins[1] = pin2;
 
+    pins[0]->wires[pins[0]->numConnections] = this;
+    pins[0]->numConnections++;
+    pins[1]->wires[pins[1]->numConnections] = this;
+    pins[1]->numConnections++;
+
     line[0] = sf::Vertex(sf::Vector2f(pins[0]->pos.x + pins[0]->rect.left+8, pins[0]->pos.y + pins[0]->rect.top+5));
     line[1] = sf::Vertex(sf::Vector2f(pins[1]->pos.x + pins[1]->rect.left+8, pins[1]->pos.y + pins[1]->rect.top+5));
 }
@@ -131,6 +136,7 @@ void Wire::updateWirePos()
 
 Pin::Pin()
 {
+    numConnections = 0;
     // std::cout << "Pin created" << std::endl;
 }
 
@@ -176,6 +182,13 @@ int LogicElement::getNumPins()
 LogicElement::~LogicElement()
 {
     // std::cout << "LogicElement destroyed" << std::endl;
+    for (int i=0; i<numPins; i++)
+    {
+        for(int j=0; j<pins[i].numConnections; j++)
+        {
+            delete pins[i].wires[j];
+        }
+    }
 }
 
 AndGate::AndGate(bool is_locked) : LogicElement(3)
@@ -540,6 +553,14 @@ void Simulator::addLogicElement(LogicElement *l)
     logicElements.push_back(l);
 }
 
+void Simulator::deleteLogicElement(int idx)
+{
+    LogicElement * l = logicElements[idx];
+    logicElements.erase(logicElements.begin() + idx);
+    delete l;
+    logicElements.shrink_to_fit();
+}
+
 std::vector<LogicElement *> Simulator::getLogicElements()
 {
     return logicElements;
@@ -557,6 +578,8 @@ std::vector<Wire *> Simulator::getWires()
 
 void Simulator::simulate()
 {
+    wires.shrink_to_fit();
+
     for (int i=0; i<wires.size(); i++)
     {
         for (int j=0; j<logicElements.size(); j++)

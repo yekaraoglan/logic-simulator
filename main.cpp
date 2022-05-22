@@ -64,6 +64,7 @@ int main()
     sf::Sprite selectedSprite;
     bool draggingObject = false;
     bool relocatingObject = false;
+    int selectedIdx = -1;
     std::vector<sf::Sprite> mainSprites;
     std::vector<sf::Sprite> addedSprites;
 
@@ -128,6 +129,7 @@ int main()
                         if (sim.getLogicElements()[j]->getSprite().getGlobalBounds().contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
                         {
                             std::cout << "Clicked a placed element" << std::endl;
+                            selectedIdx = j;
 
                             bool clickedPin = false;
 
@@ -160,7 +162,7 @@ int main()
                                 }
                             }
 
-                            if (!clickedPin)
+                            if (!clickedPin && !drawingWire)
                             {
                                 selected = sim.getLogicElements()[j];
                                 selectedSprite = selected->getSprite();
@@ -175,7 +177,7 @@ int main()
             }
             else if (event.type == sf::Event::MouseButtonReleased)
             {
-                if (selected != nullptr && !relocatingObject)
+                if (selected != nullptr && !relocatingObject && draggingObject)
                 {
                     draggingObject = false;
                     // Create new object
@@ -192,7 +194,8 @@ int main()
                     relocatingObject = false;
                 }
 
-                selected = nullptr;
+                if (draggingObject || relocatingObject)
+                    selected = nullptr;
                 // std::cout << "Dragging stopped" << std::endl;
             }
 
@@ -209,6 +212,19 @@ int main()
                 // std::cout << "Drawing wire" << std::endl;
                 wire[1] = sf::Vertex(sf::Vector2f(mouse.getPosition(window).x, mouse.getPosition(window).y));
                 window.draw(wire, 20, sf::Lines);
+            }
+
+            if (selected != nullptr)
+            {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete))
+                {
+                    if (selectedIdx != -1)
+                    {
+                        sim.deleteLogicElement(selectedIdx);
+                        selectedIdx = -1;
+                        selected = nullptr;
+                    }
+                }
             }
         }
 
