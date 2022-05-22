@@ -225,6 +225,14 @@ int main()
                         selected = nullptr;
                     }
                 }
+                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+                {
+                    if (selectedIdx != -1)
+                    {
+                        selectedIdx = -1;
+                        selected = nullptr;
+                    }
+                }
             }
         }
 
