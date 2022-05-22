@@ -65,6 +65,11 @@ int main()
     bool draggingObject = false;
     bool relocatingObject = false;
     int selectedIdx = -1;
+    sf::RectangleShape selectionRect;
+    selectionRect.setFillColor(sf::Color::Transparent);
+    selectionRect.setOutlineThickness(5);
+    selectionRect.setOutlineColor(sf::Color::Red);
+
     std::vector<sf::Sprite> mainSprites;
     std::vector<sf::Sprite> addedSprites;
 
@@ -90,7 +95,7 @@ int main()
     //     std::cout << mainSprites[j].getGlobalBounds().width << std::endl;
     //     std::cout << mainSprites[j].getGlobalBounds().height << std::endl;
     // }
-
+    
     while (window.isOpen())
     {
         sf::Event event;
@@ -216,6 +221,13 @@ int main()
 
             if (selected != nullptr)
             {
+                if (selectedIdx != -1)
+                {
+                    selectionRect.setSize(sf::Vector2f(selected->getSprite().getLocalBounds().width, selected->getSprite().getLocalBounds().height));
+                    selectionRect.setPosition(selected->getSprite().getPosition());
+                    window.draw(selectionRect);
+                }
+
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete))
                 {
                     if (selectedIdx != -1)
