@@ -219,6 +219,9 @@ int main()
                 window.draw(wire, 20, sf::Lines);
             }
 
+            if (drawingWire && sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+                drawingWire = false;
+
             if (selected != nullptr)
             {
                 if (selectedIdx != -1)
