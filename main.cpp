@@ -157,7 +157,8 @@ int main()
                                         drawingWire = false;
 
                                         Wire *w = new Wire(selectedPins[0], selectedPins[1]);
-                                        sim.addWire(w);
+                                        // sim.addWire(w);
+                                        sim.updateWires();
                                     }
 
                                     wire[0] = sf::Vertex(sf::Vector2f(sim.getLogicElements()[j]->getPins()[k].rect.left + 8, sim.getLogicElements()[j]->getPins()[k].rect.top + 5));
@@ -236,6 +237,7 @@ int main()
                     if (selectedIdx != -1)
                     {
                         sim.deleteLogicElement(selectedIdx);
+                        sim.updateWires();
                         selectedIdx = -1;
                         selected = nullptr;
                     }

@@ -181,13 +181,13 @@ int LogicElement::getNumPins()
 LogicElement::~LogicElement()
 {
     // std::cout << "LogicElement destroyed" << std::endl;
-    for (int i = 0; i < numPins; i++)
-    {
-        for (int j = 0; j < pins[i].numConnections; j++)
-        {
-            delete pins[i].wires[j];
-        }
-    }
+    // for (int i = 0; i < numPins; i++)
+    // {
+    //     for (int j = 0; j < pins[i].numConnections; j++)
+    //     {
+    //         delete pins[i].wires[j];
+    //     }
+    // }
 }
 
 AndGate::AndGate(bool is_locked) : LogicElement(3)
@@ -579,10 +579,10 @@ std::vector<LogicElement *> Simulator::getLogicElements()
     return logicElements;
 }
 
-void Simulator::addWire(Wire *l)
-{
-    wires.push_back(l);
-}
+// void Simulator::addWire(Wire *l)
+// {
+//     wires.push_back(l);
+// }
 
 std::vector<Wire *> Simulator::getWires()
 {
@@ -591,8 +591,6 @@ std::vector<Wire *> Simulator::getWires()
 
 void Simulator::simulate()
 {
-    wires.shrink_to_fit();
-
     for (int i = 0; i < wires.size(); i++)
     {
         for (int j = 0; j < logicElements.size(); j++)
@@ -605,6 +603,30 @@ void Simulator::simulate()
             wires[j]->getPins()[1]->state = wires[j]->getPins()[0]->state;
         }
     }
+}
+
+void Simulator::updateWires()
+{
+    wires.clear();
+
+    for (int i = 0; i < logicElements.size(); i++)
+    {
+        for (int j=0; j < logicElements[i]->getNumPins(); j++)
+        {
+            for (int k=0; k < logicElements[i]->getPins()[j].numConnections; k++)
+            {
+                if (!std::count(wires.begin(), wires.end(), logicElements[i]->getPins()[j].wires[k]))
+                {
+                    wires.push_back((Wire *)logicElements[i]->getPins()[j].wires[k]);
+                }
+            }
+        }
+    }
+
+    wires.shrink_to_fit();
+
+    std::cout << "# wires: " << wires.size() << std::endl;
+
 }
 
 Pin **Wire::getPins()

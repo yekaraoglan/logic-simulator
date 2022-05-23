@@ -220,11 +220,12 @@ public:
     Simulator();
     void addLogicElement(LogicElement *);
     void deleteLogicElement(int);
-    void addWire(Wire *);
+    // void addWire(Wire *);
     std::vector<LogicElement *> getLogicElements();
     std::vector<Wire *> getWires();
 
     void simulate();
+    void updateWires();
 };
 
 #endif // !OBJECT_H
