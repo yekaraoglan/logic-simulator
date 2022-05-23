@@ -1,3 +1,14 @@
+/**
+ * @file object.cpp
+ * @author Dogus Can Korkmaz, Yunus Emre Karaoglan, Serkan Basaran
+ * @brief Class implementation file of the project.
+ * @version 0.1
+ * @date 2022-05-23
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "object.h"
 #include <iostream>
 

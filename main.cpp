@@ -1,19 +1,30 @@
+/**
+ * @file main.cpp
+ * @author Dogus Can Korkmaz, Yunus Emre Karaoglan, Serkan Basaran
+ * @brief Main file for the project.
+ * @version 0.1
+ * @date 2022-05-23
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "object.h"
 #include "object.cpp"
 #include <iostream>
 #include <vector>
 
-/**
- * TODO:
- * - Set a background
- * - Smaller textures
- * - Bigger window
- * - Mouse - object interactions
- *
- */
+
 
 int main()
 {
+
+    /**
+     * Creating window and setting it's size
+     * Creating menu objects
+     * Creating simulation object
+     */
+    
     sf::RenderWindow window(sf::VideoMode(960, 720), "My window");
     window.setPosition(sf::Vector2i(0, 0));
     sf::Vector2i windowPose = window.getPosition();
@@ -46,6 +57,11 @@ int main()
     // back_text.loadFromFile("TemplateProject/assets/background.png");
     // background.setTexture(back_text);
 
+    /**
+     * Adding Start and Stop buttons to the menu
+     * Defining mouse and keyboard to get events
+     */
+
     sf::Mouse mouse;
     sf::Keyboard keyboard;
 
@@ -61,6 +77,8 @@ int main()
     stop.setTexture(stop_text);
     stop.setPosition(sf::Vector2f(400, 50));
 
+
+    // Selection operation objects
     LogicElement *selected;
     sf::Sprite selectedSprite;
     bool draggingObject = false;
@@ -71,6 +89,7 @@ int main()
     selectionRect.setOutlineThickness(5);
     selectionRect.setOutlineColor(sf::Color::Red);
 
+    // Sprites for the menu and the simulation
     std::vector<sf::Sprite> mainSprites;
     std::vector<sf::Sprite> addedSprites;
 
@@ -78,6 +97,7 @@ int main()
     sf::Vertex wire[2];
     Pin *selectedPins[2];
 
+    // Adding menu sprites
     mainSprites.push_back(start);
     mainSprites.push_back(stop);
     mainSprites.push_back(andGate.sprite);
@@ -97,13 +117,18 @@ int main()
     //     std::cout << mainSprites[j].getGlobalBounds().height << std::endl;
     // }
     
+    // Main loop
     while (window.isOpen())
     {
         sf::Event event;
+
+        // Detect event
         while (window.pollEvent(event))
         {
             window.clear();
             // window.draw(background);
+            
+            // Drawing menu objects
             for (int i = 0; i < mainSprites.size(); i++)
                 window.draw(mainSprites[i]);
 
@@ -111,12 +136,18 @@ int main()
             {
                 window.close();
             }
+
+            // Detecting mouse click
             if (event.type == sf::Event::MouseButtonPressed)
             {
+                // Left click
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
+                    // Detecting if the user clicked on the start or stop buttons
                     if(start.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y) && !isSimulating) isSimulating = true;
                     else if(stop.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y) && isSimulating) isSimulating = false;
+
+                    // Detecting if the user clicked on a menu object
                     for (int i = 0; i < menuObjects.size(); i++)
                     {
                         if (menuObjects[i]->getSprite().getGlobalBounds().contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
@@ -132,6 +163,7 @@ int main()
                         }
                     }
 
+                    // Detecting if the user clicked on a logic element in the simulation
                     for (int j = 0; j < sim.getLogicElements().size(); j++)
                     {
                         if (sim.getLogicElements()[j]->getSprite().getGlobalBounds().contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
@@ -140,7 +172,8 @@ int main()
                             selectedIdx = j;
 
                             bool clickedPin = false;
-
+                            
+                            // Detecting if the user clicked on a pin, if so, draw a wire from that pins
                             for (int k = 0; k < sim.getLogicElements()[j]->getNumPins(); k++)
                             {
                                 if (sim.getLogicElements()[j]->getPins()[k].rect.contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
@@ -171,6 +204,7 @@ int main()
                                 }
                             }
 
+                            // If the user didn't click on a pin, then the user clicked on the element itself
                             if (!clickedPin && !drawingWire)
                             {
                                 selected = sim.getLogicElements()[j];
@@ -184,8 +218,11 @@ int main()
                     }
                 }
             }
+
+            // Detecting mouse release
             else if (event.type == sf::Event::MouseButtonReleased)
             {
+                // Creating a copy of a logic element from the menu to the simulation
                 if (selected != nullptr && !relocatingObject && draggingObject)
                 {
                     draggingObject = false;
@@ -194,6 +231,8 @@ int main()
 
                     addedSprites.push_back(selectedSprite);
                 }
+
+                // Relocating a logic element in the simulation
                 else if (relocatingObject)
                 {
                     draggingObject = false;
@@ -208,6 +247,7 @@ int main()
                 // std::cout << "Dragging stopped" << std::endl;
             }
 
+            // Dragging the object sprite
             if (draggingObject)
             {
                 selectedSprite.setPosition(mouse.getPosition(window).x - selectedSprite.getLocalBounds().width / 2, mouse.getPosition(window).y - selectedSprite.getLocalBounds().height / 2);
@@ -216,6 +256,7 @@ int main()
                 // std::cout << "Dragging" << std::endl;
             }
 
+            // Drawing the wire
             if (drawingWire)
             {
                 // std::cout << "Drawing wire" << std::endl;
@@ -223,11 +264,13 @@ int main()
                 window.draw(wire, 20, sf::Lines);
             }
 
+            // Canceling the wire drawing
             if (drawingWire && sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
                 drawingWire = false;
 
             if (selected != nullptr)
             {
+                // Select the logic element in the simulation with red rectangle
                 if (selectedIdx != -1)
                 {
                     selectionRect.setSize(sf::Vector2f(selected->getSprite().getLocalBounds().width, selected->getSprite().getLocalBounds().height));
@@ -235,6 +278,7 @@ int main()
                     window.draw(selectionRect);
                 }
 
+                // Delete the logic element in the simulation
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete))
                 {
                     if (selectedIdx != -1)
@@ -245,6 +289,8 @@ int main()
                         selected = nullptr;
                     }
                 }
+
+                // Cancelling the selection of a logic element
                 else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
                 {
                     if (selectedIdx != -1)
@@ -256,15 +302,18 @@ int main()
             }
         }
 
+        // If simulation is running, update the simulation
         if (isSimulating){
             sim.simulate();
         }
 
+        // Drawing the simulation
         for (int i = 0; i < sim.getLogicElements().size(); i++)
         {
             window.draw(sim.getLogicElements()[i]->getSprite());
         }
 
+        // Drawing the wires
         for (int i = 0; i < sim.getWires().size(); i++)
         {
             sim.getWires()[i]->updateWirePos();

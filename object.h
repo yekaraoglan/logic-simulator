@@ -1,3 +1,14 @@
+/**
+ * @file object.h
+ * @author Dogus Can Korkmaz, Yunus Emre Karaoglan, Serkan Basaran
+ * @brief Header file of the project which contains the class definitions
+ * @version 0.1
+ * @date 2022-05-23
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef OBJECT_H
 #define OBJECT_H
 
@@ -5,6 +16,7 @@
 
 #define MAX_CONNECTIONS 16 // how many object is connected with this object
 
+// Object class, which is the base class of all objects
 class Object
 { // absract  // derived from logic gates
 protected:
@@ -24,9 +36,10 @@ public:
     sf::Vector2f getPos();
     void setPos(int, int);
 
-    virtual void simulate() = 0; // must be defined in derived class
+    virtual void simulate() = 0; // simulate function for all objects
 };
 
+// Pin class that implements pins in the logic gates
 class Pin
 {
 public:
@@ -59,6 +72,10 @@ public:
     void setPos(sf::Vector2f);
 };
 
+/**
+ * @brief Wire class that implements wires in simulation
+ * Derives from Object class
+ */
 class Wire : public Object
 {
 private:
@@ -73,6 +90,7 @@ public:
     void updateWirePos();
 };
 
+// Class for logic elements
 class LogicElement : public Object
 {
 protected:
@@ -91,6 +109,9 @@ public:
     Pin *getPins();
     int getNumPins();
 };
+
+/****************************************************************/
+// Logic Elements
 
 class AndGate : public LogicElement
 {
@@ -209,7 +230,9 @@ public:
 private:
     void simulate();
 };
+/****************************************************************/
 
+// Simulator class which has utilities for simulation
 class Simulator
 {
 private:
