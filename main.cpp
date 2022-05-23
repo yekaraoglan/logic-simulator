@@ -26,6 +26,7 @@ int main()
     Gnd gnd(true);
     LED led(true);
     Clock clock(true);
+    bool isSimulating = false;
 
     Simulator sim;
 
@@ -114,6 +115,8 @@ int main()
             {
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
+                    if(start.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y) && !isSimulating) isSimulating = true;
+                    else if(stop.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y) && isSimulating) isSimulating = false;
                     for (int i = 0; i < menuObjects.size(); i++)
                     {
                         if (menuObjects[i]->getSprite().getGlobalBounds().contains(mouse.getPosition(window).x, mouse.getPosition(window).y))
@@ -253,7 +256,9 @@ int main()
             }
         }
 
-        sim.simulate();
+        if (isSimulating){
+            sim.simulate();
+        }
 
         for (int i = 0; i < sim.getLogicElements().size(); i++)
         {
